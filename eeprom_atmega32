@@ -1,0 +1,27 @@
+/*
+ * eeprom_atmega32.c
+ *
+ * Created: 6/29/2014 1:44:34 PM
+ *  Author: mohamed fawzy
+ */ 
+#define F_CPU 8000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include "eeprom_atmega32.h"
+
+void EepromWrite(uint16_t address,uint8_t data)
+{
+	while(EECR & (1<<EEWE));  //wait until EEWE bit become ZERO.
+	EEAR=address;             //set the address of data to be stored in EEPROM.
+	EEDR=data;                //define the data to be stored in EEPROM.
+	EECR|=(1<<EEMWE);         //set master write enable.
+	EECR|=(1<<EEWE);          //start witting enable.
+}
+uint8_t EeprimRead(uint16_t address)
+{
+	while(EECR & (1<<EEWE));  //wait until EEWE bit become ZERO.
+	EEAR = address;           //set up the address of data to be read.
+	EECR |= (1<<EERE);        //start read operation.
+	_delay_ms(1);
+	return EEDR;              // return data read.
+}
